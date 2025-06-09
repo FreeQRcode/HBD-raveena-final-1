@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+  <title>Happy Birthday Raveena</title>
+
+  <style>
+
+    body {
+
+      background: #fff8e7;
+
+      font-family: 'Bungee Inline', cursive;
+
+      text-align: center;
+
+      padding: 20px;
+
+      overflow-x: hidden;
+
+      touch-action: manipulation;
+
+      -webkit-tap-highlight-color: transparent;
+
+    }
+
+
+
+    canvas {
+
+      border: 5px solid #f9d71c;
+
+      border-radius: 20px;
+
+      box-shadow: 0 0 15px #f9d71caa;
+
+      cursor: pointer;
+
+      margin-bottom: 10px;
+
+      max-width: 100%;
+
+      width: 100%;
+
+      height: auto;
+
+      aspect-ratio: 1/1;
+
+    }
+
+
+
+    .palette {
+
+      display: flex;
+
+      justify-content: center;
+
+      gap: 10px;
+
+      margin: 15px 0;
+
+      flex-wrap: wrap;
+
+    }
+
+
+
+    .color {
+
+      width: 30px;
+
+      height: 30px;
+
+      border-radius: 50%;
+
+      border: 2px solid #333;
+
+      cursor: pointer;
+
+      transition: transform 0.2s;
+
+    }
+
+
+
+    .color:hover, .color:active {
+
+      transform: scale(1.2);
+
+    }
+
+
+
+    .color.selected {
+
+      border: 4px solid #000;
+
+      transform: scale(1.1);
+
+    }
+
+
+
+    button {
+
+      background-color: #f9d71c;
+
+      border: none;
+
+      border-radius: 10px;
+
+      padding: 12px 25px;
+
+      font-size: 18px;
+
+      font-weight: bold;
+
+      color: #4a2c00;
+
+      cursor: pointer;
+
+      box-shadow: 0 4px 8px #c7a31b;
+
+      margin: 15px;
+
+      transition: all 0.3s;
+
+      -webkit-tap-highlight-color: transparent;
+
+    }
+
+
+
+    button:hover, button:active {
+
+      transform: translateY(-2px);
+
+      box-shadow: 0 6px 12px #c7a31b;
+
+    }
+
+
+
+    button:disabled {
+
+      background-color: #cccccc;
+
+      color: #666666;
+
+      cursor: not-allowed;
+
+      transform: none;
+
+      box-shadow: 0 4px 8px #999999;
+
+    }
+
+
+
+    #videoContainer {
+
+      display: none;
+
+      border: 8px solid #f9d71c;
+
+      border-radius: 20px;
+
+      overflow: hidden;
+
+      width: 640px;
+
+      max-width: 100%;
+
+      box-shadow: 0 0 30px #f9d71ccc;
+
+      margin: 20px auto;
+
+    }
+
+
+
+    iframe {
+
+      width: 100%;
+
+      height: 360px;
+
+      border: none;
+
+      aspect-ratio: 16/9;
+
+    }
+
+
+
+    #birthdayMessage {
+
+      display: none;
+
+      margin-top: 15px;
+
+      font-size: clamp(2rem, 8vw, 3rem);
+
+      color: #f9d71c;
+
+      text-shadow:
+
+        3px 3px 0 #4a2c00,
+
+        -1px -1px 0 #4a2c00,
+
+        1px -1px 0 #4a2c00,
+
+        -1px 1px 0 #4a2c00,
+
+        1px 1px 0 #4a2c00;
+
+      animation: pulse 1.5s infinite alternate;
+
+    }
+
+
+
+    @keyframes pulse {
+
+      from { transform: scale(1); }
+
+      to { transform: scale(1.05); }
+
+    }
+
+
+
+    .instructions {
+
+      margin: 15px auto;
+
+      max-width: 600px;
+
+      padding: 10px;
+
+      background-color: #fff;
+
+      border-radius: 10px;
+
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+      font-size: clamp(14px, 3vw, 16px);
+
+    }
+
+
+
+    #confetti-canvas {
+
+      position: fixed;
+
+      top: 0;
+
+      left: 0;
+
+      width: 100%;
+
+      height: 100%;
+
+      z-index: 1000;
+
+      pointer-events: none;
+
+      display: none;
+
+    }
+
+
+
+    .progress-container {
+
+      width: 80%;
+
+      max-width: 500px;
+
+      margin: 20px auto;
+
+      background-color: #f0e6d2;
+
+      border-radius: 10px;
+
+      height: 20px;
+
+      overflow: hidden;
+
+    }
+
+
+
+    .progress-bar {
+
+      height: 100%;
+
+      background-color: #f9d71c;
+
+      width: 0%;
+
+      transition: width 0.5s;
+
+    }
+
+
+
+    /* Mobile-specific adjustments */
+
+    @media (max-width: 600px) {
+
+      canvas {
+
+        border-width: 3px;
+
+      }
+
+      
+
+      button {
+
+        padding: 10px 20px;
+
+        font-size: 16px;
+
+      }
+
+      
+
+      .color {
+
+        width: 25px;
+
+        height: 25px;
+
+      }
+
+    }
+
+  </style>
+
+  <link href="https://fonts.googleapis.com/css2?family=Bungee+Inline&display=swap" rel="stylesheet">
+
+</head>
+
+<body>
+
+
+
+<h1>Fill the Mandala Rangoli</h1>
+
+<div class="instructions">Tap on each segment to fill it with your selected color. Fill all segments to complete!</div>
+
+
+
+<canvas id="rangoliCanvas" width="512" height="512"></canvas>
+
+
+
+<div class="progress-container">
+
+  <div class="progress-bar" id="progressBar"></div>
+
+</div>
+
+
+
+<div class="palette" id="palette">
+
+  <div class="color selected" style="background-color: #f9d71c;" data-color="#f9d71c"></div>
+
+  <div class="color" style="background-color: #ff6666;" data-color="#ff6666"></div>
+
+  <div class="color" style="background-color: #66cc66;" data-color="#66cc66"></div>
+
+  <div class="color" style="background-color: #6699ff;" data-color="#6699ff"></div>
+
+  <div class="color" style="background-color: #cc99ff;" data-color="#cc99ff"></div>
+
+  <div class="color" style="background-color: #ff9966;" data-color="#ff9966"></div>
+
+  <div class="color" style="background-color: #66cccc;" data-color="#66cccc"></div>
+
+  <div class="color" style="background-color: #ffcc66;" data-color="#ffcc66"></div>
+
+</div>
+
+
+
+<button id="completeBtn" disabled>Complete</button>
+
+
+
+<canvas id="confetti-canvas"></canvas>
+
+
+
+<div id="videoContainer">
+
+  <iframe 
+
+    src="https://www.youtube.com/embed/ClQZou9WuKM?autoplay=1" 
+
+    allow="autoplay; encrypted-media" 
+
+    allowfullscreen>
+
+  </iframe>
+
+</div>
+
+
+
+<div id="birthdayMessage">Happy Birthday Raveena!</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+<script>
+
+  // Initialize canvas with proper scaling
+
+  const canvas = document.getElementById('rangoliCanvas');
+
+  const ctx = canvas.getContext('2d');
+
+  const completeBtn = document.getElementById('completeBtn');
+
+  const palette = document.getElementById('palette');
+
+  const progressBar = document.getElementById('progressBar');
+
+  let currentColor = [249, 215, 28, 255]; // yellow
+
+  let isComplete = false;
+
+  let totalSegments = 24;
+
+  let filledSegments = 0;
+
+  const segmentMap = {};
+
+  
+
+  // Handle both mouse and touch events
+
+  const pointerEvents = ['click', 'touchstart'];
+
+  let isTouchDevice = false;
+
+
+
+  // Detect touch device
+
+  try {
+
+    document.createEvent('TouchEvent');
+
+    isTouchDevice = true;
+
+  } catch (e) {
+
+    isTouchDevice = ('ontouchstart' in window);
+
+  }
+
+
+
+  // Scale canvas for high DPI devices
+
+  function resizeCanvas() {
+
+    const size = Math.min(window.innerWidth - 40, 512);
+
+    canvas.style.width = `${size}px`;
+
+    canvas.style.height = `${size}px`;
+
+    drawMandala();
+
+  }
+
+
+
+  // Draw the mandala with clean segments
+
+  function drawMandala() {
+
+    const pixelRatio = window.devicePixelRatio || 1;
+
+    const rect = canvas.getBoundingClientRect();
+
+    
+
+    // Set actual canvas size in memory
+
+    canvas.width = rect.width * pixelRatio;
+
+    canvas.height = rect.height * pixelRatio;
+
+    
+
+    // Scale context to prevent blurriness
+
+    ctx.scale(pixelRatio, pixelRatio);
+
+    
+
+    const centerX = rect.width / 2;
+
+    const centerY = rect.height / 2;
+
+    const radius = Math.min(rect.width, rect.height) * 0.45;
+
+    
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    
+
+    // Draw outer circle
+
+    ctx.beginPath();
+
+    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+
+    ctx.strokeStyle = '#000';
+
+    ctx.lineWidth = 3;
+
+    ctx.stroke();
+
+    
+
+    // Draw segments
+
+    const segmentAngle = (Math.PI * 2) / totalSegments;
+
+    for (let i = 0; i < totalSegments; i++) {
+
+      const angle1 = i * segmentAngle;
+
+      const angle2 = (i + 1) * segmentAngle;
+
+      
+
+      // Draw segment border
+
+      ctx.beginPath();
+
+      ctx.moveTo(centerX, centerY);
+
+      ctx.lineTo(centerX + Math.cos(angle1) * radius, centerY + Math.sin(angle1) * radius);
+
+      ctx.arc(centerX, centerY, radius, angle1, angle2);
+
+      ctx.lineTo(centerX, centerY);
+
+      ctx.strokeStyle = '#000';
+
+      ctx.lineWidth = 2;
+
+      ctx.stroke();
+
+      
+
+      // Fill segment if it's been colored
+
+      if (segmentMap[i]) {
+
+        ctx.fillStyle = segmentMap[i];
+
+        ctx.fill();
+
+      }
+
+      
+
+      // Draw decorative inner circles
+
+      if (i % 3 === 0) {
+
+        const innerRadius = radius * 0.3;
+
+        ctx.beginPath();
+
+        ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+
+        ctx.stroke();
+
+      }
+
+    }
+
+    
+
+    // Draw center circle
+
+    ctx.beginPath();
+
+    ctx.arc(centerX, centerY, radius * 0.15, 0, Math.PI * 2);
+
+    ctx.stroke();
+
+  }
+
+
+
+  // Initialize the mandala
+
+  window.addEventListener('load', () => {
+
+    resizeCanvas();
+
+    window.addEventListener('resize', resizeCanvas);
+
+  });
+
+
+
+  // Handle color selection
+
+  palette.addEventListener('click', (e) => {
+
+    if (e.target.classList.contains('color')) {
+
+      document.querySelectorAll('.color').forEach(el => el.classList.remove('selected'));
+
+      e.target.classList.add('selected');
+
+      currentColor = hexToRgba(e.target.getAttribute('data-color'));
+
+    }
+
+  });
+
+
+
+  // Add touch support for color palette
+
+  if (isTouchDevice) {
+
+    palette.addEventListener('touchstart', (e) => {
+
+      if (e.target.classList.contains('color')) {
+
+        e.preventDefault();
+
+        document.querySelectorAll('.color').forEach(el => el.classList.remove('selected'));
+
+        e.target.classList.add('selected');
+
+        currentColor = hexToRgba(e.target.getAttribute('data-color'));
+
+      }
+
+    }, { passive: false });
+
+  }
+
+
+
+  function hexToRgba(hex) {
+
+    const bigint = parseInt(hex.replace('#', ''), 16);
+
+    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255, 255];
+
+  }
+
+
+
+  // Handle both touch and mouse events for painting
+
+  function handlePointerEvent(e) {
+
+    if (isComplete) return;
+
+    
+
+    // Get correct coordinates for both touch and mouse
+
+    const rect = canvas.getBoundingClientRect();
+
+    let x, y;
+
+    
+
+    if (e.type === 'touchstart' || e.type === 'touchmove') {
+
+      e.preventDefault();
+
+      x = e.touches[0].clientX - rect.left;
+
+      y = e.touches[0].clientY - rect.top;
+
+    } else {
+
+      x = e.clientX - rect.left;
+
+      y = e.clientY - rect.top;
+
+    }
+
+    
+
+    const centerX = rect.width / 2;
+
+    const centerY = rect.height / 2;
+
+    const dx = x - centerX;
+
+    const dy = y - centerY;
+
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    
+
+    // Ignore clicks in the center or outside the mandala
+
+    if (distance < 20 || distance > rect.width / 2 * 0.9) return;
+
+    
+
+    // Calculate which segment was clicked
+
+    let angle = Math.atan2(dy, dx);
+
+    if (angle < 0) angle += Math.PI * 2;
+
+    const segment = Math.floor(angle / (Math.PI * 2 / totalSegments));
+
+    
+
+    // Get the hex color
+
+    const hexColor = `#${currentColor[0].toString(16).padStart(2, '0')}${currentColor[1].toString(16).padStart(2, '0')}${currentColor[2].toString(16).padStart(2, '0')}`;
+
+    
+
+    // Only count as new fill if changing color
+
+    if (!segmentMap[segment] || segmentMap[segment] !== hexColor) {
+
+      if (!segmentMap[segment]) filledSegments++;
+
+      segmentMap[segment] = hexColor;
+
+      drawMandala();
+
+      updateProgress();
+
+      
+
+      // Enable complete button if all segments are filled
+
+      if (filledSegments >= totalSegments) {
+
+        completeBtn.disabled = false;
+
+      }
+
+    }
+
+  }
+
+
+
+  // Add both mouse and touch events
+
+  pointerEvents.forEach(event => {
+
+    canvas.addEventListener(event, handlePointerEvent, { passive: false });
+
+  });
+
+
+
+  function updateProgress() {
+
+    const progress = Math.min(100, Math.floor((filledSegments / totalSegments) * 100));
+
+    progressBar.style.width = `${progress}%`;
+
+  }
+
+
+
+  function triggerConfetti() {
+
+    const confettiCanvas = document.getElementById('confetti-canvas');
+
+    confettiCanvas.style.display = 'block';
+
+    
+
+    // Confetti configuration
+
+    const confettiSettings = {
+
+      particleCount: 150,
+
+      spread: 70,
+
+      origin: { y: 0.6 },
+
+      colors: ['#f9d71c', '#ff6666', '#66cc66', '#6699ff', '#cc99ff', '#ff9966']
+
+    };
+
+    
+
+    // Fire confetti
+
+    confetti.create(confettiCanvas, {
+
+      resize: true,
+
+      useWorker: true
+
+    })(confettiSettings);
+
+    
+
+    // Additional bursts
+
+    setTimeout(() => confetti(confettiSettings), 300);
+
+    setTimeout(() => confetti(confettiSettings), 600);
+
+    setTimeout(() => confetti(confettiSettings), 900);
+
+    
+
+    // Hide confetti after animation
+
+    setTimeout(() => {
+
+      confettiCanvas.style.display = 'none';
+
+    }, 2000);
+
+  }
+
+
+
+  // Handle both mouse and touch for complete button
+
+  completeBtn.addEventListener('click', handleCompletion);
+
+  if (isTouchDevice) {
+
+    completeBtn.addEventListener('touchend', handleCompletion);
+
+  }
+
+
+
+  function handleCompletion(e) {
+
+    if (e.type === 'touchend') {
+
+      e.preventDefault();
+
+    }
+
+    
+
+    isComplete = true;
+
+    canvas.style.display = 'none';
+
+    palette.style.display = 'none';
+
+    completeBtn.style.display = 'none';
+
+    document.querySelector('.instructions').style.display = 'none';
+
+    
+
+    // Show confetti first
+
+    triggerConfetti();
+
+    
+
+    // Then show video and message after a delay
+
+    setTimeout(() => {
+
+      document.getElementById('videoContainer').style.display = 'block';
+
+      document.getElementById('birthdayMessage').style.display = 'block';
+
+      
+
+      // Force video to play with sound
+
+      const iframe = document.querySelector('iframe');
+
+      iframe.src += "&mute=0";
+
+    }, 2000);
+
+  }
+
+</script>
+
+
+
+</body>
+
+</html>
